@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluesky Repost Visualizer</title>
+    <script>
+        async function processLink() {
+            const link = document.getElementById("blueskyLink").value;
+            if (!link) {
+                alert("Please enter a valid Bluesky post link.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/process", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ link })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById("graphImage").src = data.graph_image;
+                    document.getElementById("graphContainer").style.display = "block";
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                console.error("Error processing link:", error);
+                alert("An error occurred. Check the console for details.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Bluesky Repost Visualizer</h1>
+    <p>Enter the Bluesky post link below:</p>
+    <input type="text" id="blueskyLink" placeholder="Enter Bluesky post link">
+    <button onclick="processLink()">Generate Graph</button>
+    <div id="graphContainer" style="display:none;">
+        <h2>Repost Graph:</h2>
+        <img id="graphImage" src="" alt="Graph Image">
+    </div>
+</body>
+</html>
